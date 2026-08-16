@@ -1,0 +1,24 @@
+services:
+  telegram-bot:
+    build: .
+    container_name: telegram-bot
+    restart: unless-stopped
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN:?BOT_TOKEN is required}
+      - AUTHORIZED_USERS=${AUTHORIZED_USERS:?AUTHORIZED_USERS is required — comma-separated Telegram user IDs}
+      - ASR_MODEL=${ASR_MODEL:-distil-large-v3}
+      - WHISPER_DEVICE=${WHISPER_DEVICE:-cpu}
+      - WHISPER_COMPUTE=${WHISPER_COMPUTE:-float32}
+      - ASR_NUM_THREADS=${ASR_NUM_THREADS:-4}
+      - LLM_BASE_URL=${LLM_BASE_URL:-http://your-llm-server:8088/v1}
+      - LLM_API_KEY=${LLM_API_KEY:-not-needed}
+      - LLM_MODEL=${LLM_MODEL:-grug-35b-v2-iq4xs}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./data:/data       # personas.yaml + optional message history
+      - whisper-cache:/root/.cache   # faster-whisper model cache
+    ports:
+      - "127.0.0.1:8080:8080"   # Prometheus metrics (optional)
+
+volumes:
+  whisper-cache:
